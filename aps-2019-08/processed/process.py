@@ -6,13 +6,14 @@ from hexrd import imageseries
 
 
 DATA = Path.home() / "Data"
-FMT = 'image-files'
 DETS = (1, 2, 3, 4)
 
 Pims = imageseries.process.ProcessedImageSeries
 
 
 class Processor:
+
+    FMT = 'image-files'
 
     def __init__(self, scan_group, scan_num, detector):
         self.scan_group = scan_group
@@ -25,17 +26,19 @@ class Processor:
 
     @property
     def directory(self):
-        return f"../raw/ge{self.detector}"
+        return f"../raw/{self.detector}"
 
-    def imagefiles_yaml_tmpl(self, det):
-        return """# Image files imageseries
+    def load(self, num_empty=1):
+        return imageseries.open(self.imagefiles_yaml_tmpl(num_empty), self.FMT)
+
+    def imagefiles_yaml_tmpl(self, num_empty=1):
+        return f"""# Image files imageseries
 image-files:
-   directory: {directory}
-   files: {file}
+   directory: {self.directory}
+   files: {self.filename}
 options:
    empty-frames: {num_empty}
 meta: {{}}
-
 """
 
 
@@ -48,14 +51,6 @@ options:
 meta: {{}}
 
 """
-
-
-def load(scan, snum, det):
-    fstr = img_files_tmpl.format(
-        scan=scan, snum=snum, det=det, num_empty=1
-    )
-    ims = imageseries.open(fstr, FMT)
-    return ims
 
 
 def process(ims, nchunk):
