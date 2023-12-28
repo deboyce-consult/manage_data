@@ -88,29 +88,15 @@ meta: {{}}
 
     def save_processed_ims(self, threshold):
         """Save processed imageseries"""
+        print("saving processed imageseries as frame-cache")
         imageseries.save.write(
-            self.proc_ims, self.save_file, "frame-cache", threshold=threshold
+            self.proc_ims, self.proc_filename, "frame-cache",
+            threshold=threshold, cache_file=self.proc_filename
         )
+        print("done")
 
-
-
-    def histogram(self):
-        ...
-
-
-def check(ims):
-    """Check imageseries"""
-    n = len(ims)
-    print("length: ", n)
-    imax = imageseries.stats.max(ims)
-    imin = imageseries.stats.min(ims)
-    print("min/max: ", imin.min(), imax.max())
-
-    # Check cache size
-    for threshold in (0, 25, 50, 100, 200):
-        nzvals = cache_size(ims, threshold)
-        print(f"threshold: {threshold}")
-        print(f"cache size: {nzvals:,}")
+    def cache_size(self, threshold):
+        return cache_size(self.proc_ims, threshold)
 
 
 def cache_size(ims, threshold):
@@ -120,20 +106,3 @@ def cache_size(ims, threshold):
         nzvals += np.count_nonzero(ims[i] > threshold)
 
     return nzvals
-
-
-def main():
-
-    nchunk = 360
-    scan, snum = "Ruby_line_ff", 17
-    scan, snum = "Ruby_box_ff", 18
-    for det in DETS:
-        print("\n\nscan: ", scan, snum, det)
-        ims = load(scan, snum, det)
-        print("imageseries loaded, processing ...")
-        pims = process(ims, nchunk)
-        check(pims)
-
-
-if __name__ == "__main__":
-    main()
