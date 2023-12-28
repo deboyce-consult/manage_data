@@ -19,6 +19,7 @@ class Processor:
         self.scan_group = scan_group
         self.scan_num = scan_num
         self.detector = detector
+        self.raw_ims = None
 
     @property
     def filename(self):
@@ -29,7 +30,10 @@ class Processor:
         return f"../raw/{self.detector}"
 
     def load(self, num_empty=1):
-        return imageseries.open(self.imagefiles_yaml_tmpl(num_empty), self.FMT)
+        print("loading", flush=True)
+        self.raw_ims = imageseries.open(
+            self.imagefiles_yaml_tmpl(num_empty), self.FMT
+        )
 
     def imagefiles_yaml_tmpl(self, num_empty=1):
         return f"""# Image files imageseries
@@ -41,16 +45,34 @@ options:
 meta: {{}}
 """
 
+    @property
+    def dark_file(self):
+        """Name of file to save/load dark image"""
+        return f"dark-{self.filename}.npz"
 
-img_files_tmpl = """# Image files imageseries
-image-files:
-   directory: ../raw/ge{det}
-   files: {scan}_{snum:06d}.ge{det}
-options:
-   empty-frames: {num_empty}
-meta: {{}}
+    def save_dark(self, img):
+        np.savez(self.dark_file, dark=img)
 
-"""
+    def make_dark(self, nframes, nchunks):
+        if self.raw_ims is None:
+            self.load()
+        print("making dark")
+        i = 0
+        for dark in imageseries.stats.median_iter(
+                self.raw_ims, nchunks, nframes=nframes
+        ):
+            i += 1
+            print(f"\r{i}/{nchunks}", end="", flush=True)
+        return dark
+
+    def dark(self, nframes, nchunks):
+        p = Path(self.dark_file)
+        if p.exists():
+            dark = np.load(p)['dark']
+        else:
+            dark = self.make_dark(nframes, nchunks)
+            self.save_dark(dark)
+        return dark
 
 
 def process(ims, nchunk):

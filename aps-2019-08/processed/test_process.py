@@ -21,5 +21,9 @@ def test_yaml_tmpl(ruby_line_17):
 
 
 def test_load(ruby_line_17):
-    ims = ruby_line_17.load()
-    assert len(ims) == 1440
+    ruby_line_17.load()
+    assert len(ruby_line_17.raw_ims) == 1440
+
+
+def test_dark(ruby_line_17):
+    dark = ruby_line_17.dark(100, 360)
