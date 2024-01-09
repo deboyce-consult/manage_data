@@ -23,6 +23,10 @@ class Processor:
         self.proc_ims = None
 
     @property
+    def directory(self):
+        return f"../raw"
+
+    @property
     def raw_filename(self):
         """filename of raw data"""
         return f"{self.scan_group}_{self.scan_num:06d}.{self.detector}"
@@ -30,16 +34,13 @@ class Processor:
     @property
     def dark_filename(self):
         """Name of file to save/load dark image"""
-        return f"{self.scan_group}_{self.scan_num:06d}_{self.detector}_dark.npz"
+        scan = f"{self.scan_group}_{self.scan_num:06d}"
+        return f"dark/{scan}_{self.detector}_dark.npz"
 
     @property
     def proc_filename(self):
         """File name to save processed imageseries"""
         return f"{self.scan_group}_{self.scan_num:06d}_{self.detector}.npz"
-
-    @property
-    def directory(self):
-        return f"../raw/{self.detector}"
 
     def load(self, num_empty=1):
         print("loading raw imageseries", flush=True)
@@ -70,6 +71,7 @@ meta: {{}}
         ):
             i += 1
             print(f"\r{i}/{nchunks}", end="", flush=True)
+        print("", flush=True)
         return dark
 
     def dark(self, nframes=100, nchunks=360):
