@@ -9,6 +9,8 @@ from process import Processor
 scan, snum = "Ruby_line_ff", 17
 scan, snum = "Ruby_box_ff", 18
 scan, snum = "lshr_r6_s0_box_ff", 41
+scan, snum = "lshr_r6_s6_line_ff", 87
+
 
 dets = ("ge1", "ge2", "ge3", "ge4")
 
@@ -58,8 +60,9 @@ def check(scan, snum):
 
 
 check(scan, snum)
-threshold = 4
-ans = input(f"threshold = {threshold}: save? [yes/no]: ")
+input(f"{50 * '='} ready to save ...")
+threshold = 5
+ans = input(f"save with threshold = {threshold}? [yes/no]: ")
 if ans == "yes":
     save_dets(scan, snum, dets, threshold)
 else:

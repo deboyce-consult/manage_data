@@ -38,9 +38,15 @@ class Processor:
         return f"dark/{scan}_{self.detector}_dark.npz"
 
     @property
+    def proc_dir(self):
+        """Directory for saving processed imageseries"""
+        return "frame-cache"
+
+    @property
     def proc_filename(self):
         """File name to save processed imageseries"""
-        return f"{self.scan_group}_{self.scan_num:06d}_{self.detector}.npz"
+        fname = f"{self.scan_group}_{self.scan_num:06d}_{self.detector}.npz"
+        return fname
 
     def load(self, num_empty=1):
         print("loading raw imageseries", flush=True)
@@ -91,8 +97,9 @@ meta: {{}}
     def save_processed_ims(self, threshold):
         """Save processed imageseries"""
         print("saving processed imageseries as frame-cache")
+        proc_path = f"{self.proc_dir}/{self.proc_filename}"
         imageseries.save.write(
-            self.proc_ims, self.proc_filename, "frame-cache",
+            self.proc_ims, proc_path, "frame-cache",
             threshold=threshold, cache_file=self.proc_filename
         )
         print("done")
