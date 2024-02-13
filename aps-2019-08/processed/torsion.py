@@ -8,8 +8,9 @@ from process import Processor
 
 scan, snum = "Ruby_line_ff", 17
 scan, snum = "Ruby_box_ff", 18
-scan, snum = "lshr_r6_s0_box_ff", 41
 scan, snum = "lshr_r6_s6_line_ff", 87
+scan, snum_range = "lshr_r6_s3_box_ff", range(63, 68)
+scan, snum_range = "lshr_r6_s4_box_ff", range(69, 74)
 
 
 dets = ("ge1", "ge2", "ge3", "ge4")
@@ -49,7 +50,7 @@ def image_histograms(ims):
 
 def check(scan, snum):
     for det in dets:
-        input(f"{scan}-{snum}-{det}: continue?")
+        input(f"{scan}-{snum}-{det}: continue? ")
         processor = Processor(scan, snum, det)
         processor.load()
         processor.process()
@@ -58,12 +59,12 @@ def check(scan, snum):
         image_histograms(processor.proc_ims)
 
 
-
-check(scan, snum)
-input(f"{50 * '='} ready to save ...")
-threshold = 5
-ans = input(f"save with threshold = {threshold}? [yes/no]: ")
-if ans == "yes":
-    save_dets(scan, snum, dets, threshold)
-else:
-    print("quitting without saving")
+for snum in snum_range:
+    check(scan, snum)
+    input(f"{50 * '='} ready to save ...")
+    threshold = 5
+    ans = input(f"save with threshold = {threshold}? [yes/no]: ")
+    if ans == "yes":
+        save_dets(scan, snum, dets, threshold)
+    else:
+        print("quitting without saving")
