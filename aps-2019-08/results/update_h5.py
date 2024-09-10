@@ -27,7 +27,9 @@ def update(hfile, sample):
         HDF5 path to data
     """
     with h5py.File(hfile, "r+") as hf:
-        read_graindata(hf, sample)
+        gdata = read_graindata(hf, sample)
+
+    return gdata
 
 
 def read_graindata(hf, sample):
@@ -43,17 +45,37 @@ def read_graindata(hf, sample):
     data = hf[sample]
     states = data["states"]
     nstates = len(states)
+    ngrains = data[f"states/state_00/ff/table"].shape[0]
+    #
+    # Initialize the grain data arrays.
+    #
+    gid = np.zeros((nstates, ngrains), dtype=int)
+    cmpl = np.zeros((nstates, ngrains))
+    chisq = np.zeros((nstates, ngrains))
+    expmap = np.zeros((nstates, ngrains, 3))
+    cent = np.zeros((nstates, ngrains, 3))
+    inv_V = np.zeros((nstates, ngrains, 6))
+    ln_Vs = np.zeros((nstates, ngrains, 6))
     for i in range(nstates):
         table = data[f"states/state_{i:02d}/ff/table"]
-        print(i, table.shape)
+        gid[i] = table[:,0]
+        cmpl[i] = table[:,1]
+        chisq[i] = table[:,2]
+        expmap[i] = table[:, 3:6]
+        cent[i] = table[:, 6:9]
+        inv_V[i] = table[:, 9:15]
+        ln_Vs[i] = table[:, 15:21]
 
+    return GrainData(gid, cmpl, chisq, expmap, cent, inv_V, ln_Vs
+                     )
 
 def main(args):
     """main program
 
     args - from argparser
     """
-    update(args.datafile, args.sample)
+    gdata = update(args.datafile, args.sample)
+    print(gdata)
 
 
 def argparser(*args):
