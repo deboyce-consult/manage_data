@@ -16,7 +16,7 @@ _flds = [
 GrainData = namedtuple("GrainData", _flds)
 
 
-def update(hfile, sample):
+def read_graindata(hfile, sample):
     """Update the HDF5 file
 
     PARAMETERS
@@ -26,13 +26,13 @@ def update(hfile, sample):
     sample: str
         HDF5 path to data
     """
-    with h5py.File(hfile, "r+") as hf:
-        gdata = read_graindata(hf, sample)
+    with h5py.File(hfile, "r") as hf:
+        gdata = _read_graindata(hf, sample)
 
     return gdata
 
 
-def read_graindata(hf, sample):
+def _read_graindata(hf, sample):
     """Read grain data
 
     PARAMETERS
@@ -74,7 +74,7 @@ def main(args):
 
     args - from argparser
     """
-    gdata = update(args.datafile, args.sample)
+    gdata = read_graindata(args.datafile, args.sample)
     print(gdata)
 
 

@@ -11,4 +11,4 @@ SAMPLE = "sample_00"
 
 
 def get_data():
-    return update_h5.update(FF_DATA, SAMPLE)
+    return read.read_graindata(FF_DATA, SAMPLE)
