@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 
-from . import update_h5
+from . import read
 
 HERE = Path(__file__).parent
 FF_DATA = HERE / "2024_09_06_lshr_r6.h5"
